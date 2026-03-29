@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cambios Élite — Bogotá</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080c14;
+      --surface: #0e1420;
+      --surface2: #141b2d;
+      --border: rgba(255,255,255,0.07);
+      --gold: #c9a84c;
+      --gold-light: #e8c96a;
+      --gold-dim: rgba(201,168,76,0.15);
+      --text: #eef0f4;
+      --muted: #6b7589;
+      --green: #2ed573;
+      --red: #ff4d6d;
+      --blue: #4d9fff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.4;
+    }
+
+    /* Glow blobs */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob-1 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+      top: -150px; right: -100px;
+    }
+    .blob-2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(77,159,255,0.08) 0%, transparent 70%);
+      bottom: 100px; left: -100px;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 32px;
+      background: rgba(8,12,20,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .logo span { color: var(--gold); }
+
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--gold);
+      color: #080c14;
+      border: none;
+      padding: 9px 20px;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      text-decoration: none;
+    }
+    .nav-cta:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+    /* HERO */
+    .hero {
+      position: relative; z-index: 1;
+      padding: 90px 32px 60px;
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--gold-dim);
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--gold-light);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+    .dot-live {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--gold);
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      max-width: 440px;
+      margin-bottom: 36px;
+    }
+
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--gold);
+      color: #080c14;
+      padding: 13px 26px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: none; cursor: pointer;
+    }
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent;
+      color: var(--text);
+      padding: 13px 24px;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+
+    /* HERO STATS */
+    .hero-stats {
+      display: flex; gap: 32px;
+      margin-top: 44px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+    .stat-item {}
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+    /* CALCULATOR CARD */
+    .calc-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+      animation: fadeInRight 0.7s ease both;
+    }
+    @keyframes fadeInRight {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .calc-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+    }
+
+    .calc-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .calc-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+    .calc-badge {
+      background: rgba(46,213,115,0.12);
+      color: var(--green);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 100px;
+      border: 1px solid rgba(46,213,115,0.2);
+    }
+
+    .calc-row {
+      display: flex; gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .currency-select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 12px 14px;
+      width: 110px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .currency-select:focus { border-color: var(--gold); }
+
+    .amount-input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .amount-input:focus { border-color: var(--gold); }
+    .amount-input::placeholder { color: var(--muted); font-weight: 400; font-size: 0.9rem; }
+
+    .swap-btn {
+      width: 100%; padding: 10px;
+      background: var(--gold-dim);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 8px;
+      color: var(--gold);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 16px;
+    }
+    .swap-btn:hover { background: rgba(201,168,76,0.25); }
+
+    .result-box {
+      background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(201,168,76,0.03));
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+    }
+    .result-label { font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .result-amount {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      letter-spacing: -0.02em;
+    }
+    .result-rate { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+
+    .calc-btn {
+      width: 100%;
+      margin-top: 16px;
+      padding: 14px;
+      background: var(--gold);
+      border: none;
+      border-radius: 10px;
+      color: #080c14;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .calc-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+    /* RATES TABLE */
+    .section {
+      position: relative; z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 60px 32px;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .section-sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 36px; }
+
+    .rates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .rate-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: border-color 0.2s, transform 0.2s;
+      cursor: default;
+      animation: fadeIn 0.5s ease both;
+    }
+    .rate-card:hover { border-color: rgba(201,168,76,0.3); transform: translateY(-2px); }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .flag {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      background: var(--surface2);
+      flex-shrink: 0;
+    }
+
+    .rate-info { flex: 1; }
+    .rate-pair {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 2px;
+    }
+    .rate-sub { font-size: 0.78rem; color: var(--muted); }
+
+    .rate-values { text-align: right; }
+    .rate-buy { font-size: 0.75rem; color: var(--muted); }
+    .rate-sell-val {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .rate-change {
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 3px;
+    }
+    .up { color: var(--green); }
+    .down { color: var(--red); }
+
+    /* DIVIDER */
+    .divider {
+      max-width: 1100px;
+      margin: 0 auto;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* WHY US */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 20px;
+      margin-top: 36px;
+    }
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      transition: border-color 0.2s;
+    }
+    .feature-card:hover { border-color: rgba(201,168,76,0.25); }
+    .feature-icon {
+      font-size: 1.8rem;
+      margin-bottom: 16px;
+    }
+    .feature-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 8px;
+    }
+    .feature-text { font-size: 0.875rem; color: var(--muted); line-height: 1.65; }
+
+    /* CONTACT */
+    .contact-section {
+      position: relative; z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 60px 32px 100px;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      align-items: start;
+    }
+
+    .contact-info h2 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 2rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+    .contact-info p { color: var(--muted); line-height: 1.7; margin-bottom: 32px; }
+
+    .contact-item {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 18px;
+      padding: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .contact-icon { font-size: 1.3rem; }
+    .contact-detail-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .contact-detail-val { font-weight: 600; font-size: 0.95rem; }
+
+    .whatsapp-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: #25D366;
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+    .whatsapp-btn:hover { background: #20bd5b; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,211,102,0.3); }
+
+    /* Form */
+    .contact-form {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+    }
+    .contact-form h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 22px;
+    }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 0.8rem; font-weight: 500; color: var(--muted); margin-bottom: 8px; display: block; }
+    .form-input, .form-textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-textarea:focus { border-color: var(--gold); }
+    .form-textarea { resize: vertical; min-height: 100px; }
+    .form-submit {
+      width: 100%;
+      padding: 13px;
+      background: var(--gold);
+      border: none;
+      border-radius: 10px;
+      color: #080c14;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 6px;
+    }
+    .form-submit:hover { background: var(--gold-light); }
+
+    /* FOOTER */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 28px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 1100px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+    }
+    .footer-logo span { color: var(--gold); }
+    footer p { font-size: 0.8rem; color: var(--muted); }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; gap: 40px; padding: 50px 20px 40px; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .hero-stats { gap: 20px; }
+      .section { padding: 50px 20px; }
+      .contact-section { padding: 40px 20px 70px; }
+      nav { padding: 16px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">Cambios<span>Élite</span></div>
+    <div class="nav-links">
+      <a href="#tasas">Tasas</a>
+      <a href="#nosotros">Nosotros</a>
+      <a href="#contacto">Contacto</a>
+    </div>
+    <a href="#contacto" class="nav-cta">Cotizar ahora</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-text" style="animation: fadeIn 0.6s ease both;">
+      <div class="hero-eyebrow">
+        <span class="dot-live"></span>
+        Tasas actualizadas hoy
+      </div>
+      <h1>Cambia divisas con <em>confianza</em> en Bogotá</h1>
+      <p>Las mejores tasas del mercado, atención personalizada y transacciones seguras. USD, EUR, GBP y más.</p>
+      <div class="hero-actions">
+        <a href="#calculadora" class="btn-primary">Calcular cambio</a>
+        <a href="#contacto" class="btn-ghost">Hablar con asesor</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num">12+</div>
+          <div class="stat-label">Años de experiencia</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">8</div>
+          <div class="stat-label">Divisas disponibles</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">3.500+</div>
+          <div class="stat-label">Clientes satisfechos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALCULATOR -->
+    <div class="calc-card" id="calculadora">
+      <div class="calc-header">
+        <div class="calc-title">Calculadora de Cambio</div>
+        <div class="calc-badge">● En línea</div>
+      </div>
+
+      <div class="calc-row">
+        <select class="currency-select" id="fromCurrency" onchange="calculate()">
+          <option value="USD">🇺🇸 USD</option>
+          <option value="EUR">🇪🇺 EUR</option>
+          <option value="GBP">🇬🇧 GBP</option>
+          <option value="COP">🇨🇴 COP</option>
+        </select>
+        <input class="amount-input" id="amountInput" type="number" placeholder="Ingresa el monto" oninput="calculate()" value="100"/>
+      </div>
+
+      <button class="swap-btn" onclick="swapCurrencies()">⇅ Invertir divisas</button>
+
+      <div class="calc-row">
+        <select class="currency-select" id="toCurrency" onchange="calculate()">
+          <option value="COP">🇨🇴 COP</option>
+          <option value="USD">🇺🇸 USD</option>
+          <option value="EUR">🇪🇺 EUR</option>
+          <option value="GBP">🇬🇧 GBP</option>
+        </select>
+        <div class="result-box" style="flex:1; text-align:left;">
+          <div class="result-label">Recibes</div>
+          <div class="result-amount" id="resultAmount">$ —</div>
+          <div class="result-rate" id="resultRate">Ingresa un monto para calcular</div>
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="scrollToContact()">Quiero hacer este cambio →</button>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- RATES TABLE -->
+  <section class="section" id="tasas">
+    <div class="section-label">Tasas del día</div>
+    <div class="section-title">Precios en tiempo real</div>
+    <div class="section-sub">Actualizados con las tasas del mercado colombiano. Consulta antes de venir.</div>
+
+    <div class="rates-grid" id="ratesGrid"></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- WHY US -->
+  <section class="section" id="nosotros">
+    <div class="section-label">¿Por qué elegirnos?</div>
+    <div class="section-title">Más que un cambio de divisas</div>
+    <div class="section-sub">Llevamos más de una década siendo el aliado de confianza para empresas y personas en Bogotá.</div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🏦</div>
+        <div class="feature-title">Tasas preferenciales</div>
+        <div class="feature-text">Para clientes frecuentes y empresas ofrecemos tasas especiales negociadas directamente.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">Transacciones rápidas</div>
+        <div class="feature-text">Sin filas largas. Tu cambio listo en minutos con confirmación inmediata.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔐</div>
+        <div class="feature-title">100% seguro y legal</div>
+        <div class="feature-text">Registrados ante la SFC. Todas las operaciones con soporte documental y cumplimiento SARLAFT.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📲</div>
+        <div class="feature-title">Atención por WhatsApp</div>
+        <div class="feature-text">Cotiza desde tu celular y recibe atención personalizada antes de venir a nuestra oficina.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CONTACT -->
+  <section class="contact-section" id="contacto">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <div class="section-label">Contáctanos</div>
+        <h2>Estamos listos para atenderte</h2>
+        <p>Visítanos en nuestra oficina, escríbenos por WhatsApp o llénanos el formulario y te respondemos en menos de 30 minutos.</p>
+
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div>
+            <div class="contact-detail-label">Dirección</div>
+            <div class="contact-detail-val">Cra 7 #32-15, Bogotá D.C.</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">⏰</div>
+          <div>
+            <div class="contact-detail-label">Horario</div>
+            <div class="contact-detail-val">Lun–Vie 8am–6pm · Sáb 9am–2pm</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div>
+            <div class="contact-detail-label">Teléfono</div>
+            <div class="contact-detail-val">+57 310 000 0000</div>
+          </div>
+        </div>
+
+        <a href="https://wa.me/573100000000?text=Hola,%20quiero%20cotizar%20un%20cambio" class="whatsapp-btn" target="_blank">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Escribir por WhatsApp
+        </a>
+      </div>
+
+      <div class="contact-form">
+        <h3>Solicitar cotización</h3>
+        <div class="form-group">
+          <label class="form-label">Nombre completo</label>
+          <input class="form-input" type="text" placeholder="Tu nombre"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Teléfono o email</label>
+          <input class="form-input" type="text" placeholder="Cómo te contactamos"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">¿Qué divisa necesitas cambiar?</label>
+          <input class="form-input" type="text" placeholder="Ej: 500 USD a COP"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mensaje (opcional)</label>
+          <textarea class="form-textarea" placeholder="Cuéntanos más sobre tu operación..."></textarea>
+        </div>
+        <button class="form-submit" onclick="submitForm()">Enviar solicitud →</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-logo">Cambios<span>Élite</span></div>
+    <p>© 2025 CambiosÉlite · Bogotá, Colombia</p>
+    <p style="font-size:0.75rem; color: var(--muted);">Registrado SFC · Cumplimiento SARLAFT</p>
+  </footer>
+
+  <script>
+    // --- RATES DATA (demo) ---
+    const rates = {
+      USD: { buy: 4120, sell: 4185, change: +0.42, flag: '🇺🇸', name: 'Dólar Estadounidense' },
+      EUR: { buy: 4460, sell: 4530, change: -0.18, flag: '🇪🇺', name: 'Euro' },
+      GBP: { buy: 5220, sell: 5310, change: +0.61, flag: '🇬🇧', name: 'Libra Esterlina' },
+      CAD: { buy: 3020, sell: 3085, change: +0.15, flag: '🇨🇦', name: 'Dólar Canadiense' },
+      CHF: { buy: 4680, sell: 4760, change: -0.09, flag: '🇨🇭', name: 'Franco Suizo' },
+      MXN: { buy: 225,  sell: 235,  change: +0.33, flag: '🇲🇽', name: 'Peso Mexicano' },
+    };
+
+    // Render rates cards
+    const grid = document.getElementById('ratesGrid');
+    Object.entries(rates).forEach(([code, r], i) => {
+      const card = document.createElement('div');
+      card.className = 'rate-card';
+      card.style.animationDelay = `${i * 0.08}s`;
+      const sign = r.change >= 0 ? '+' : '';
+      const cls = r.change >= 0 ? 'up' : 'down';
+      const arrow = r.change >= 0 ? '↑' : '↓';
+      card.innerHTML = `
+        <div class="flag">${r.flag}</div>
+        <div class="rate-info">
+          <div class="rate-pair">${code} / COP</div>
+          <div class="rate-sub">${r.name}</div>
+        </div>
+        <div class="rate-values">
+          <div class="rate-buy">Compra: $${r.buy.toLocaleString('es-CO')}</div>
+          <div class="rate-sell-val">$${r.sell.toLocaleString('es-CO')}</div>
+          <div class="rate-change ${cls}">${arrow} ${sign}${r.change}% hoy</div>
+        </div>`;
+      grid.appendChild(card);
+    });
+
+    // --- CALCULATOR ---
+    function getRateToCOP(currency) {
+      if (currency === 'COP') return 1;
+      return rates[currency]?.sell || 1;
+    }
+
+    function calculate() {
+      const from = document.getElementById('fromCurrency').value;
+      const to   = document.getElementById('toCurrency').value;
+      const amt  = parseFloat(document.getElementById('amountInput').value);
+      const resultEl = document.getElementById('resultAmount');
+      const rateEl   = document.getElementById('resultRate');
+
+      if (!amt || isNaN(amt)) {
+        resultEl.textContent = '$ —';
+        rateEl.textContent   = 'Ingresa un monto para calcular';
+        return;
+      }
+
+      let result, rateUsed;
+      if (from === to) {
+        result = amt; rateUsed = 1;
+      } else if (to === 'COP') {
+        rateUsed = getRateToCOP(from);
+        result = amt * rateUsed;
+      } else if (from === 'COP') {
+        rateUsed = getRateToCOP(to);
+        result = amt / rateUsed;
+      } else {
+        const cop = amt * getRateToCOP(from);
+        rateUsed = getRateToCOP(to);
+        result = cop / rateUsed;
+      }
+
+      const formatter = new Intl.NumberFormat('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      resultEl.textContent = `$${formatter.format(result)} ${to}`;
+      rateEl.textContent   = `Tasa referencial de mercado · Solo informativa`;
+    }
+
+    function swapCurrencies() {
+      const from = document.getElementById('fromCurrency');
+      const to   = document.getElementById('toCurrency');
+      const tmp  = from.value;
+      from.value = to.value;
+      to.value   = tmp;
+      calculate();
+    }
+
+    function scrollToContact() {
+      document.getElementById('contacto').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function submitForm() {
+      alert('¡Solicitud enviada! Te contactaremos en menos de 30 minutos.');
+    }
+
+    // Init
+    calculate();
+  </script>
+</body>
+</html>
